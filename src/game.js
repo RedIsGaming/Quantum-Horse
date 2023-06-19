@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	document.getElementById('start').onclick = function() {
 		Button.enabled("start", false);
-		Button.enabled("pos", true);
+		//Button.enabled("pos", true);
 		Button.enabled("measure", true);
 
         //random = execute(document.getElementById("email").value, document.getElementById("password").value,'version 1.0\nqubits 2\nprep_z q[0]\nprep_z q[1]\nH q[0]\nCNOT q[0],q[1]\nmeasure q[0]\nmeasure q[1]', 10);

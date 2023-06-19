@@ -15,11 +15,10 @@ class Button {
 
 class Uncertainty {
 	listeners = [];
-	constructor(from, to, id, id_number) {
+
+	constructor(from, to) {
 		this.from = from;
 		this.to = to;
-		this.id = id;
-		this.id_number = id_number;
 	}
 
 	update() {
@@ -35,19 +34,8 @@ class Uncertainty {
 	
 	measure() {
 		this.update();
-		this.from = Math.round(Math.random(this.to - this.from)) + this.from;
-		this.to = Math.round(Math.random(this.to)) + this.to;
-	}
-
-	randomMeasure() {
-		this.update();
-		this.from -= Math.random() * 10;
-		this.to += Math.random() * 10;
-	}
-	
-	increase(speed) {
-		this.from += speed.from;
-		this.to += speed.to;
+		this.from = parseFloat((Math.random() * 1).toFixed(2) + this.from)
+		this.to = parseFloat((Math.random() * 1).toFixed(2) + this.from)
 	}
 }
 
@@ -61,28 +49,50 @@ let num_lap = 1;
   
 function Horse(id, x, y) {
 	this.status = document.getElementById(id);
-	this.speed = Math.random() * 10 + 10;
+	this.number = parseInt(id.replace("horse", "")) /*Horse number*/
 
 	this.originX = x;
 	this.originY = y;
 	this.x = x;
 	this.y = y;
-	this.number = parseInt(id.replace("horse", "")) /*Horse number*/
+	
 	this.lap = 0;
-	
-	this.stopID = null;
+	this.stop_horse = null;
+
 	let speed_label = document.getElementById(id + "Speed");
-	let speed = new Uncertainty(10, 20);
-	
-	speed.subscribe(() => {
-		speed_label.innerText = "Speed for " + id + " is: " + speed.from + " to " + speed.to;
+	const uncertainty = new Uncertainty(0.1, 0.3);
+	this.speed = (uncertainty.from + uncertainty.to) / 2;
+	this.random_speed = Math.random();
+
+	let on_measure = false;
+
+	document.getElementById('measure').addEventListener('click', function() {
+		on_measure = true;
+	});
+
+	document.getElementById('pos').addEventListener('click', function() {
+		uncertainty.measure();
+		this.speed;
+	});
+
+	uncertainty.subscribe(() => {
+		speed_label.innerText = "Speed for " + id + " is: " + uncertainty.from + " to " + uncertainty.to;
 	});
 
 	this.moveRight = function() {
 		let horse = this;
 
-		this.stopID = setTimeout(function() {
-			horse.x++;
+		this.stop_horse = setTimeout(function() {
+			if (on_measure) {
+				uncertainty.measure();
+				on_measure = false;
+				horse.speed = (uncertainty.from + uncertainty.to) / 2;
+			}
+
+			else {
+				horse.x += horse.speed;
+			}
+
 			horse.status.style.left = horse.x + 'vw';
 
 			if (horse.lap == num_lap && horse.x > horse.originX + 6) {
@@ -96,18 +106,26 @@ function Horse(id, x, y) {
 				
 				else {
 					horse.status.className = 'horse runDown';
-					horse.speed = Math.random() * 10 + 10;
 					horse.moveDown();
 				}
 			}
-		}, 1000 / this.speed);
+		}, 16.67) //60 fps
 	}
 
 	this.moveDown = function() {
 		let horse = this;
 
-		this.stopID = setTimeout(function() {
-			horse.y++;
+		this.stop_horse = setTimeout(function() {
+			if (on_measure) {
+				uncertainty.measure();
+				on_measure = false;
+				horse.speed = (uncertainty.from + uncertainty.to) / 2;
+			}
+
+			else {
+				horse.y += horse.speed;
+			}
+
 			horse.status.style.top = horse.y + 'vh';
 
 			if (horse.y < horse.originY + 65) {
@@ -116,17 +134,25 @@ function Horse(id, x, y) {
 			
 			else {
 				horse.status.className = 'horse runLeft';
-				horse.speed = Math.random() * 10 + 10;
 				horse.moveLeft();
 			}
-		}, 1000 / this.speed)
+		}, 16.67) //60 fps
 	}
 	
 	this.moveLeft = function() {
 		let horse = this;
 
-		this.stopID = setTimeout(function() {
-			horse.x--;
+		this.stop_horse = setTimeout(function() {
+			if (on_measure) {
+				uncertainty.measure();
+				on_measure = false;
+				horse.speed = (uncertainty.from + uncertainty.to) / 2;
+			}
+
+			else {
+				horse.x -= horse.speed;
+			}
+
 			horse.status.style.left = horse.x + 'vw';
 
 			if (horse.x > 12.5 - horse.number * 2.5) {
@@ -135,21 +161,28 @@ function Horse(id, x, y) {
 			
 			else {
 				horse.status.className = 'horse runUp';
-				horse.speed = Math.random() * 10 + 10;
 				horse.moveUp();
 			}
-		}, 1000 / this.speed)
+		}, 16.67) //60 fps
 	}
 
 	this.moveUp = function() {
 		let horse = this;
 
-		this.stopID = setTimeout(function() {
-			horse.y--;
+		this.stop_horse = setTimeout(function() {
+			if (on_measure) {
+				uncertainty.measure();
+				on_measure = false;
+				horse.speed = (uncertainty.from + uncertainty.to) / 2;
+			}
+
+			else {
+				horse.y -= horse.speed;
+			}
+
 			horse.status.style.top = horse.y + 'vh';
 
 			if (horse.y > horse.originY) {
-				horse.speed = Math.random() * 10 + 10;
 				horse.moveUp();
 			}
 			
@@ -158,7 +191,7 @@ function Horse(id, x, y) {
 				horse.lap++;
 				horse.moveRight();
 			}
-		}, 1000 / this.speed)
+		}, 16.67) //60 fps
 	}
 
 	this.run = function() {
@@ -167,7 +200,7 @@ function Horse(id, x, y) {
 	}
 
 	this.stop = function() {
-		clearTimeout(this.stopID);
+		clearTimeout(this.stop_horse);
 	}
 
 	this.arrive = function(numbering) {
@@ -201,6 +234,10 @@ function Horse(id, x, y) {
 			Button.enabled('pos', false);
 			Button.enabled('measure', false);
 		}
+	}
+
+	this.measurePosition = function() {
+		uncertainty.measure();
 	}
 }
 
