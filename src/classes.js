@@ -34,8 +34,8 @@ class Uncertainty {
 	
 	measure() {
 		this.update();
-		this.from = parseFloat((Math.random() * 1).toFixed(2) + this.from)
-		this.to = parseFloat((Math.random() * 1).toFixed(2) + this.from)
+		this.from = parseFloat((Math.random() * 0.4).toFixed(2) + this.from)
+		this.to = parseFloat((Math.random() * 0.4).toFixed(2) + this.from)
 	}
 }
 
@@ -259,6 +259,10 @@ function setInvisibility(visibility) {
 
 		else {
 			horse.status.style.display = "inline";
+
+			setTimeout(function() {
+				setInvisibility(true);
+			}, 1000);
 		}
 	}
 }
