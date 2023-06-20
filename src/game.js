@@ -19,8 +19,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	document.getElementById('start').onclick = function() {
 		Button.enabled("start", false);
-		//Button.enabled("pos", true);
+		Button.enabled("pos", true);
 		Button.enabled("measure", true);
+		setInvisibility(true);
 
         //random = execute(document.getElementById("email").value, document.getElementById("password").value,'version 1.0\nqubits 2\nprep_z q[0]\nprep_z q[1]\nH q[0]\nCNOT q[0],q[1]\nmeasure q[0]\nmeasure q[1]', 10);
 		amount = parseInt(document.getElementById('amount').value);
@@ -38,28 +39,6 @@ document.addEventListener("DOMContentLoaded", function() {
 		else {
 			this.disabled = true;
 
-			document.getElementById("pos").onclick = function() {
-				Button.enabled("pos", false);
-				Button.enabled("measure", true);
-				setInvisibility(false);
-
-				for (const horse of horses) {
-					horse.run();
-				}
-			}
-
-			document.getElementById("measure").onclick = function() {
-				Button.enabled("pos", true);
-				Button.enabled("measure", false);
-				setInvisibility(true);
-
-				for (const horse of horses) {
-					horse.stop();
-				}
-				
-				this.disabled = true;
-			}
-
 			const tds = document.querySelectorAll('#results .result');
 
 			for (let i = 0; i < tds.length; i++) {
@@ -76,10 +55,26 @@ document.addEventListener("DOMContentLoaded", function() {
 	};
 
 	document.getElementById("pos").onclick = function() {
-		setInvisibility(true);
-	};
+		Button.enabled("pos", false);
+		setInvisibility(false);
+
+		setTimeout(function() {
+			setInvisibility(true);
+		}, 850);
+
+		//new random speed for every horse
+		for (const horse of horses) {
+			horse.measurePosition();
+		}
+	}
 
 	document.getElementById("measure").onclick = function() {
-		setInvisibility(false);
-	};
+		Button.enabled("measure", false);
+
+		for (const horse of horses) {
+			horse.measurePosition();
+		}
+		
+		this.disabled = true;
+	}
 });

@@ -259,10 +259,6 @@ function setInvisibility(visibility) {
 
 		else {
 			horse.status.style.display = "inline";
-
-			setTimeout(function() {
-				setInvisibility(true);
-			}, 1000);
 		}
 	}
 }
